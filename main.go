@@ -11,7 +11,7 @@ import (
 // This file can run any crawler, should mainly be used for local testing as crawlers should be deployed indiviually
 func main() {
 	// Creates connection to local db called insiderviz-crawler2 with username and password "root"
-	conn := crawler_utils.CreateMySQLConnection("root:root@tcp(127.0.0.1:3306)/insiderviz-crawler") 
+	conn := crawler_utils.CreateMySQLConnection("root:root@tcp(127.0.0.1:3306)/insiderviz-crawler2") 
 	defer conn.Close()
 
 	test_live(conn)
@@ -23,7 +23,7 @@ func test_live(conn *sql.DB) {
 }
 
 func test_local(conn *sql.DB) {
-	folder := "./submissions/NOT_THERE_YET"
+	folder := "./submissions/2024-01-27"
 
 	offset := 0 // start at the first company
 	stride := 1 // only go one at a time

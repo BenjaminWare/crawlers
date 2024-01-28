@@ -44,7 +44,9 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 		if len(forms) > 0 {
 			thread_guard <- struct{}{} // would block if guard channel is already filled
 			wg.Add(1)
+			currentFilesMutex.Lock()
 			currentFiles[i] = struct{}{}
+			currentFilesMutex.Unlock()
 			go func(forms []FormJsonEntry,i int,request_guard chan struct{},currentFiles map[int]struct{},currentFilesMutex *sync.Mutex) {
 				
 				//Handles all the forms for this issuer

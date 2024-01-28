@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"sync"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	. "insiderviz.com/shared_crawler_functions"
 )
 
@@ -59,17 +61,15 @@ func live_crawl(conn *sql.DB) {
 	When a form is detected as already being in the db the crawling stops 
 */
 func RunLiveCrawler(conn *sql.DB) {
-	// timezone, err := time.LoadLocation("America/New_York")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	timezone, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Println("STARTING SCHEDULER")
-	live_crawl(conn)
-	// s := gocron.NewScheduler(timezone)
-	// // Schedule the job to run every 5 minutes
-	// s.Cron("*/5 0-18 * * 1-5").Do(func() {
-	// 	live_crawl(conn)
-	// })
-	// s.StartBlocking()
+	s := gocron.NewScheduler(timezone)
+	// Schedule the job to run every 5 minutes
+	s.Cron("*/5 0-18 * * 1-5").Do(func() {
+		live_crawl(conn)
+	})
+	s.StartBlocking()
 }
