@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+# Submission folder containing dumps from the SEC, multiple Gigabytes
+submissions
