@@ -1,9 +1,5 @@
 package live_crawler
 
-import (
-	. "insiderviz.com/shared_crawler_functions"
-)
-
 /*
 	Given the @acc_num,@link to a forms html page will parse the form into a RawForm4 and pass to the output channel
 	@acc_num,@link are a forms acc_num and link
@@ -16,8 +12,12 @@ func FormWorker(acc_num string, link string, request_guard chan struct{},output 
 	if err != nil {
 		panic(err)
 	}
-	xml := FromURLLoadForm4XML(xmlUri,acc_num, "Ware benwareohio@gmail.com",request_guard)
+	xml,err := FromURLLoadForm4XML(xmlUri,acc_num, "Ware benwareohio@gmail.com",request_guard)
 
-	output <- xml
+	if err == nil {
+		output <- xml
+	} else {
+		print(err)
+	}
 
 }

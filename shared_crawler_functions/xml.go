@@ -3,17 +3,17 @@ package shared_crawler_functions
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
 )
 
-func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct{}) RawForm4 {
+func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct{}) (RawForm4,error) {
 	var form4 RawForm4
 
 	// create the http request
@@ -47,43 +47,39 @@ func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct
 		}
 	}
 	
-	if !requestSuccess {
-		fmt.Println("Form that failed", url)
+	if requestSuccess {
+		// get data from res body
+		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			panic(err)
-		} else {
-			panic("REQUEST FAILED: Incorrect status code after 3 attempts: " + strconv.Itoa(resp.StatusCode))
 		}
-	}
 
-	// get data from res body
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	// parse the xml
-	xml.Unmarshal(data, &form4)	
-	if(len(form4.Footnotes.Footnote) > 0) {
-		//Trims whitespace around Footnote ids " F2 " -> "F2"
-		FootnotesWhitespaceless := make([]Footnote,len(form4.Footnotes.Footnote))
-		for i, footnote := range form4.Footnotes.Footnote {
-			FootnotesWhitespaceless[i] = Footnote{
-				XMLName: footnote.XMLName,
-				Text: footnote.Text,
-				FootnoteId: strings.TrimSpace(footnote.FootnoteId),
+		// parse the xml
+		xml.Unmarshal(data, &form4)	
+		if(len(form4.Footnotes.Footnote) > 0) {
+			//Trims whitespace around Footnote ids " F2 " -> "F2"
+			FootnotesWhitespaceless := make([]Footnote,len(form4.Footnotes.Footnote))
+			for i, footnote := range form4.Footnotes.Footnote {
+				FootnotesWhitespaceless[i] = Footnote{
+					XMLName: footnote.XMLName,
+					Text: footnote.Text,
+					FootnoteId: strings.TrimSpace(footnote.FootnoteId),
+				}
 			}
+			form4.Footnotes.Footnote = FootnotesWhitespaceless
+			decoder := xml.NewDecoder(bytes.NewReader(data))
+			walkXML(xml.Name{}, decoder, form4,[]int{-1,-1,-1,-1},-1)
 		}
-		form4.Footnotes.Footnote = FootnotesWhitespaceless
-		decoder := xml.NewDecoder(bytes.NewReader(data))
-		walkXML(xml.Name{}, decoder, form4,[]int{-1,-1,-1,-1},-1)
-	}
-	today := time.Now()
-	form4.AccessionNumber = accNum
-	form4.Url = url
-	form4.DateAdded = today.Format("2006-01-02")    
+		today := time.Now()
+		form4.AccessionNumber = accNum
+		form4.Url = url
+		form4.DateAdded = today.Format("2006-01-02")    
 
-	return form4
+		return form4,nil
+	} else {
+		// Form couldn't be parsed
+		return form4, errors.New("Couldn't Parse Form: " + url)
+	}
 }
 
 /*
