@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
+	. "insiderviz.com/crawlers/shared_crawler_functions"
 )
 
 type formJsonEntry struct {

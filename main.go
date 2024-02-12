@@ -2,6 +2,10 @@ package main
 
 import (
 	"database/sql"
+
+	. "insiderviz.com/crawlers/live_crawler"
+	. "insiderviz.com/crawlers/local_crawler"
+	. "insiderviz.com/crawlers/shared_crawler_functions"
 )
 
 // This file can run any crawler, should mainly be used for local testing as crawlers should be deployed indiviually

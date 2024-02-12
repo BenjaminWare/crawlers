@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync/atomic"
 	"time"
+
+	. "insiderviz.com/crawlers/shared_crawler_functions"
 )
 
 /*

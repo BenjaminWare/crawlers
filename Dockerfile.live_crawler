@@ -1,0 +1,14 @@
+FROM golang:1.20 as build
+WORKDIR /live_crawler
+
+# Copy dependencies list
+COPY go.mod go.sum ./
+# Build with optional lambda.norpc tag
+COPY ./live_crawler/cmd/main.go .
+COPY ./live_crawler ./live_crawler
+COPY ./shared_crawler_functions ./shared_crawler_functions
+RUN go build -tags lambda.norpc -o main main.go
+# Copy artifacts to a clean image
+FROM public.ecr.aws/lambda/provided:al2023
+COPY --from=build /live_crawler/main ./main
+ENTRYPOINT [ "./main" ]

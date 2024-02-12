@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+
+	. "insiderviz.com/crawlers/shared_crawler_functions"
 )
 
 /*
 	Runs a live crawl of the SEC RSS feed into the provided @conn sql DB
 */
-func LiveCrawl(conn *sql.DB) {
+func LiveCrawl(conn *sql.DB) bool{
 	
 	//Context allows the SaveForm thread to cancel the LoadForm thread when a duplicate is found
 	ctx, cancel := context.WithCancel(context.Background())
@@ -49,6 +51,7 @@ func LiveCrawl(conn *sql.DB) {
 	} else {
 		fmt.Println("SUCCESS: WE GOT EVERY FORM")
 	}
+	return duplicate
 }
 
 
