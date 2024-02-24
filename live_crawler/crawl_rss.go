@@ -26,6 +26,7 @@ func populateFeeds(feeds []*gofeed.Feed, parser *gofeed.Parser, client *http.Cli
 
 	i := 0
 	for skip := 0; skip <= 2000; skip += limit {
+		//TODO replace this with ConsumeSECRequest()
 		if timeCounter == 9 {
 			curTime := time.Now().UnixMilli()
 			dif := curTime - lastTime

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	. "insiderviz.com/crawlers/shared_crawler_functions"
+	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 type formJsonEntry struct {
@@ -61,7 +61,7 @@ func getForm4RSS(output chan RawForm4,ctx context.Context) {
 							close(output) 
 							return
 						default:
-							FormWorker(accNumWithDashes,link,request_guard,output)
+							FormWorker(accNumWithDashes,link,output)
 					}
 
 

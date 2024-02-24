@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	. "insiderviz.com/crawlers/shared_crawler_functions"
+	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 /*
@@ -26,8 +26,7 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 	var wg sync.WaitGroup
 	fileNames := GetFilenamesInDirectory(submissions_folder)
 	
-	request_guard := make(chan struct{} , 1)
-	request_guard<-struct{}{}
+
 
 	//Loop through all the files, which are all the forms filed for companies and insiders, we only care about companies
 	var formsCompleted int32 = 0
@@ -47,10 +46,10 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 			currentFilesMutex.Lock()
 			currentFiles[i] = struct{}{}
 			currentFilesMutex.Unlock()
-			go func(forms []FormJsonEntry,i int,request_guard chan struct{},currentFiles map[int]struct{},currentFilesMutex *sync.Mutex) {
+			go func(forms []FormJsonEntry,i int,currentFiles map[int]struct{},currentFilesMutex *sync.Mutex) {
 				
 				//Handles all the forms for this issuer
-				issuerWorker(forms,request_guard,conn,&formsCompleted,int64(start_time),"Ben maple6leaf@gmail.com")
+				issuerWorker(forms,conn,&formsCompleted,int64(start_time),"Ben maple6leaf@gmail.com")
 
 				//Handles the goroutine ending
 				<-thread_guard
@@ -73,7 +72,7 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 				fmt.Printf("Smallest File(Where you should restart): %d\n",smallestFile)
 				fmt.Println("---------------------------------------------")
 				defer wg.Done()
-			}(forms,i,request_guard,currentFiles,&currentFilesMutex)
+			}(forms,i,currentFiles,&currentFilesMutex)
 		}
 
 	}

@@ -1,4 +1,4 @@
-package shared_crawler_functions
+package shared_crawler_utils
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"unicode"
 )
 
-func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct{}) (RawForm4,error) {
+func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 	var form4 RawForm4
 
 	// create the http request
@@ -34,12 +34,7 @@ func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct
 	requestSuccess := false
 	for i := 0; i < 3 && !requestSuccess; i++ { 
 		//Only make request to SEC if one is available obeying 10/sec rule
-		<-request_guard
-		//After 110 milliseconds a new request is put on 
-		go func(request_guard chan struct{}) {
-			time.Sleep(110 * time.Millisecond)
-			request_guard<-struct{}{}
-		}(request_guard)
+		ConsumeSECRequest()
 		resp, err = client.Do(req)
 		//404 is allowed because it means the form doesn't exist
 		if err == nil && (resp.StatusCode == 200 || resp.StatusCode == 404){
@@ -78,7 +73,7 @@ func FromURLLoadForm4XML(url, accNum, userAgent string,request_guard chan struct
 		return form4,nil
 	} else {
 		// Form couldn't be parsed
-		return form4, errors.New("Couldn't Parse Form: " + url)
+		return form4, errors.New("Status Code: " + resp.Status + "Form: " + url)
 	}
 }
 

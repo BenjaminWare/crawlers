@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	crawler_utils "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 
-func GetXMLUri(link string, request_guard chan struct{}) (string, error) {
+func GetXMLUri(link string) (string, error) {
 	// scrape the page for the XML uri
 	// create the http request
 	req, err := http.NewRequest("GET", link, nil)
@@ -23,12 +23,7 @@ func GetXMLUri(link string, request_guard chan struct{}) (string, error) {
 
 	// create the http client
 	client := &http.Client{}
-	<-request_guard
-	//After 110 milliseconds a new request is put on
-	go func(request_guard chan struct{}) {
-		time.Sleep(110 * time.Millisecond)
-		request_guard <- struct{}{}
-	}(request_guard)
+	crawler_utils.ConsumeSECRequest()
 
 	resp, err := client.Do(req)
 	if resp.StatusCode == 429 {

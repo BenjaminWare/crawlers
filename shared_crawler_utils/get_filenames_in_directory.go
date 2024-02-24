@@ -1,4 +1,4 @@
-package shared_crawler_functions
+package shared_crawler_utils
 
 import "os"
 

@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 
 	. "insiderviz.com/crawlers/live_crawler"
-	. "insiderviz.com/crawlers/shared_crawler_functions"
+	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 var (

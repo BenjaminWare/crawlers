@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-co-op/gocron"
 
-	. "insiderviz.com/crawlers/shared_crawler_functions"
+	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 /*
@@ -21,7 +21,6 @@ func LiveCrawl(conn *sql.DB) bool{
 	ctx, cancel := context.WithCancel(context.Background())
 	// create the channel to pass through data
 	data := make(chan RawForm4)
-	
 	// Creates second thread for getForm4RSS
 	var wg sync.WaitGroup
 	wg.Add(1)

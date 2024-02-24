@@ -1,6 +1,7 @@
 # crawlers
 
 A collection of crawlers used to crawl SEC data into SQL databases expects a .env file at the root with a connection_string variable set.
+
 Setting up Live-Crawler:
 To build the live crawler docker image from the root directory (The file is named Dockerfile.live_crawler anticipating the creation of other dockerfiles):
 docker build -f Dockerfile.live_crawler --platform linux/amd64 -t docker-image:test .

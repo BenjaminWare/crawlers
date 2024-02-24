@@ -6,22 +6,22 @@ import (
 	"sync/atomic"
 	"time"
 
-	. "insiderviz.com/crawlers/shared_crawler_functions"
+	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 /*
 Does the work of loading and saving one issuers worth of forms, while respecting the global 10 request a second to the sec limit
 */
-func issuerWorker(forms []FormJsonEntry, request_guard chan struct{}, conn *sql.DB, counter *int32, start_time int64, userAgent string) {
+func issuerWorker(forms []FormJsonEntry, conn *sql.DB, counter *int32, start_time int64, userAgent string) {
 
 	for _, form := range forms {
 
 		//Makes request to the SEC and gets rawform4 back, which has all needed info
-		xml,err := FromURLLoadForm4XML(form.Url, form.AccNum, userAgent, request_guard)
+		xml,err := FromURLLoadForm4XML(form.Url, form.AccNum, userAgent)
 
 		//Uses rawForm4 struct to populate database
 		if err != nil {
-			print(err)
+			panic(err)
 		} else {
 			SaveForm(conn, xml)
 			atomic.AddInt32(counter, 1)
