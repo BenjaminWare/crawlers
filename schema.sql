@@ -12,6 +12,10 @@ DROP TABLE IF EXISTS form;
 
 DROP TABLE IF EXISTS issuer;
 
+DROP TABLE IF EXISTS stock_day;
+
+DROP TABLE IF EXISTS ticker;
+
 DROP TABLE IF EXISTS reporter;
 
 -- +goose Up
@@ -23,26 +27,26 @@ CREATE TABLE issuer (
     sic_description varchar(300),
     ein varchar(10),
     state_of_incorporation varchar(2),
-    fiscal_year_end date,
+    fiscal_year_end varchar(4),
     phone varchar(20),
     sector varchar(100),
     industry varchar(100)
 );
 
-CREATE TABLE tickers (
+CREATE TABLE ticker (
     id serial primary key,
     cik varchar(10) not null references issuer (cik),
     ticker varchar(10) not null,
     UNIQUE (ticker)
-)
+);
 
 CREATE TABLE stock_day (
     id serial primary key,
-    ticker not null references tickers (ticker),
+    ticker varchar(10) not null references ticker (ticker),
     date varchar(10) not null,
-    close decimal(19,4) not null, 
+    close decimal(19,4) not null
     -- Could include more info for each day, open high low ...
-)
+);
 
 CREATE TABLE reporter (
     cik varchar(10) primary key,
@@ -52,7 +56,7 @@ CREATE TABLE reporter (
 CREATE TABLE form (
     acc_num varchar(20) primary key,
     created_at timestamp not null default current_timestamp,
-    issuer_ticker varchar(10) not null refereces tickers (ticker),
+    issuer_ticker varchar(10) not null references tickers (ticker),
     period_of_report varchar(10) not null,
     rpt_is_director boolean not null,
     rpt_is_officer boolean not null,

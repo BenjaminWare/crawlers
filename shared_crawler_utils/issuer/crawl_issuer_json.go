@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"os"
 
-	. "insiderviz.com/crawlers/shared_crawler_utils"
+	utils "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 
-func CrawlIssuerJSON(cik string) Issuer {
-	var issuer Issuer
+func crawlIssuerJSON(cik string) utils.Issuer {
+	var issuer utils.Issuer
 	client := &http.Client{}
 
 	url := "https://data.sec.gov/submissions/CIK"+cik+".json"
@@ -27,7 +27,7 @@ func CrawlIssuerJSON(cik string) Issuer {
 	req.Host = "data.sec.gov"
 
 	// Only make the request if the global guard allows it
-	ConsumeSECRequest()
+	utils.ConsumeSECRequest()
 	// Make the request using http.Client
 	resp, err := client.Do(req)
 	if err != nil {
@@ -73,7 +73,7 @@ func getSectorAndIndustry(tickers []string) (string, string, error) {
 	m := createSectorMap(data)
 
 	// search for each ticker within the entries
-	sector, industry := "NONE", "NONE"
+	sector, industry := "", ""
 	for _, ticker := range tickers {
 		// search the map for the ticker
 		if val, ok := m[ticker]; ok {

@@ -301,12 +301,6 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 
 		// Only input all the other tables if the form was successfuly inserted
 		if rowsAffectedErr == nil && rowsAffected == 1{
-			// save issuer and reporter
-			err = setIssuer(tx,"TODO","TODO")
-			if err != nil {
-				fmt.Println("Error saving issuer:", err)
-				panic(err)
-			}
 			
 			err = setReporter(tx, form.ReportingOwners[0].ReportingOwnerId.RptOwnerCik, form.ReportingOwners[0].ReportingOwnerId.RptOwnerName)
 			if err != nil {
