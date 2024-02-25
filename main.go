@@ -5,6 +5,7 @@ import (
 
 	live "insiderviz.com/crawlers/live_crawler"
 	local "insiderviz.com/crawlers/local_crawler"
+	utils "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 // This file can run any crawler, should mainly be used for local testing as crawlers should be deployed indiviually

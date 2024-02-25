@@ -34,9 +34,8 @@ CREATE TABLE issuer (
 );
 
 CREATE TABLE ticker (
-    id serial primary key,
     cik varchar(10) not null references issuer (cik),
-    ticker varchar(10) not null,
+    ticker varchar(10) primary key,
     UNIQUE (ticker)
 );
 

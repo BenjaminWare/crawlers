@@ -21,7 +21,8 @@ func CrawlIssuersByCIK(conn *sql.DB, ciks []string,num_threads int) {
 			// Uses 0 padded version of cik
 			issuer.Cik = cik
 			saveIssuer(conn, issuer)
-			fmt.Printf("Finished%d/%d: %s\t%s\n",count,len(ciks),issuer.Name,issuer.Cik)
+			saveTickers(conn,issuer)
+			fmt.Printf("Finished%d/%d: %s\t%s\n",count+1,len(ciks),issuer.Name,issuer.Cik)
 			<-thread_guard
 		}(cik,i)
 

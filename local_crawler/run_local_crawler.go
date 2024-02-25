@@ -35,7 +35,7 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 	var currentFilesMutex sync.Mutex
 	start_time := time.Now().UnixMilli();
 	
-	for i :=offset; i <200;i+=stride {
+	for i :=offset; i <20;i+=stride {
 		fileName := fileNames[i]
 		//forms has all the acc_nums and urls needed to get all the forms for a specific issuer
 		forms,cik := parseSubmissionsFileJSON(submissions_folder+"/"+fileName, start,end)
