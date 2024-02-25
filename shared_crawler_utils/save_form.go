@@ -4,20 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 )
 
-func setIssuer(tx *sql.Tx, cik, name string) error {
-	issuerSql := `
-	insert into issuer (cik, name, ticker,sic, sic_description, ein, state_of_incorporation, phone, sector, industry)
-	values (?, ?, '', '', '', '', '', '', '')
-	ON DUPLICATE KEY UPDATE cik=cik
-	`
-	_, err := tx.Exec(issuerSql, cik, name)
-
-	return err
-}
 
 func setReporter(tx *sql.Tx, cik, name string) error {
 	reporterSql := `
@@ -249,9 +240,17 @@ func saveFootnoteInst(tx *sql.Tx, acc_num string, f_id int, dt_id interface{}, n
 	}
 }
 
-// Puts one RawForm4 in the db this includes entering any associated transactions, footnotes or footnote_inst
-// Returns true when the form was already in the db and false otherwise that includes successfully entry or error
+/*
+	Puts one form in the db this includes writing the form table and all tables depending on form (transactions, footnotes etc)
+	It also saves the reporter found on the form (because reporter are just cik,name if they get more complicated move this functionality)
+
+	Returns true when the form is already present in the DB (this indicates the live crawler should stop)
+
+*/
 func SaveForm(Conn *sql.DB,form RawForm4) bool{
+
+		// 2.8147498e+14 largest dollar amount we will hold, so it fits in sql and is consistent value, no floating point weirdness on powers of two
+		var MONEY_MAX float32 =float32(math.Pow(2,48))
 		form_duplicate := false
 		// start the transaction
 		tx, err := Conn.BeginTx(context.TODO(),nil)
@@ -279,6 +278,15 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 				net_total += trans.TransactionAmounts.TransactionPricePerShare.Value * trans.TransactionAmounts.TransactionShares.Value
 			}
 		}
+
+		// clamp numeric values so they fit in sql field
+		if net_total > MONEY_MAX {
+			net_total = MONEY_MAX
+		}
+		if net_shares > MONEY_MAX {
+			net_shares = MONEY_MAX
+		}
+
 		transaction_codes_slice :=  (strings.Split(transaction_codes, ""))
 		sort.Strings(transaction_codes_slice)
 		transaction_codes = strings.Join(transaction_codes_slice,"")
@@ -290,11 +298,13 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 		values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON DUPLICATE KEY UPDATE acc_num=acc_num
 		`
-		formResponse, err = tx.Exec(formSql, form.AccessionNumber,/**form.IssuerTradingSymbol,*/ form.PeriodOfReport[:10], form.ReportingOwners[0].ReportingOwnerRelationship.IsDirector,
+		formResponse, err = tx.Exec(formSql, form.AccessionNumber, form.PeriodOfReport[:10], form.ReportingOwners[0].ReportingOwnerRelationship.IsDirector,
 			form.ReportingOwners[0].ReportingOwnerRelationship.IsOfficer, form.ReportingOwners[0].ReportingOwnerRelationship.IsTenPercentOwner,
 			form.ReportingOwners[0].ReportingOwnerRelationship.IsOther, form.ReportingOwners[0].ReportingOwnerRelationship.OfficerTitle,
 			form.ReportingOwners[0].ReportingOwnerRelationship.OtherText, form.IssuerCIK, form.ReportingOwners[0].ReportingOwnerId.RptOwnerCik, form.Url, "",net_shares,net_total,transaction_codes)
+			
 		if err != nil {
+			fmt.Println(net_total)
 			fmt.Println("Error saving form:", err)
 		}
 		rowsAffected,rowsAffectedErr := formResponse.RowsAffected()

@@ -14,7 +14,8 @@ type FormJsonEntry struct {
 //Given a json filename and start/end dates
 //If the file is an Issuer gets all acc_nums from between start/end
 //If its a reporter returns empty
-func getFormsFromJson(fileName, startDate string,endDate string) []FormJsonEntry {
+// Returns the forms to crawl and the cik if it is an issuer or empty string otherwise
+func parseSubmissionsFileJSON(fileName, startDate string,endDate string) ([]FormJsonEntry, string) {
 	typeOfEntity := "Both"
 	entries := make([]FormJsonEntry, 0)
 
@@ -36,9 +37,7 @@ func getFormsFromJson(fileName, startDate string,endDate string) []FormJsonEntry
 
 	// setup the cik
 	cik := apiResponse.Cik
-	for len(cik) < 10 {
-		cik = "0" + cik
-	}
+	cik = strings.Repeat("0",10 - len(cik)) + cik
 
 	// check the type of entity
 	if apiResponse.IsIssuer == 1 && apiResponse.IsReporter == 0 {
@@ -48,7 +47,7 @@ func getFormsFromJson(fileName, startDate string,endDate string) []FormJsonEntry
 	}
 
 	if typeOfEntity == "Reporter" {
-		return entries
+		return entries,""
 	}
 
 	// loop through the filings
@@ -79,7 +78,7 @@ func getFormsFromJson(fileName, startDate string,endDate string) []FormJsonEntry
 		}
 	}
 
-	return entries
+	return entries,cik
 
 }
 

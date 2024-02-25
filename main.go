@@ -5,7 +5,6 @@ import (
 
 	live "insiderviz.com/crawlers/live_crawler"
 	local "insiderviz.com/crawlers/local_crawler"
-	utils "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
 // This file can run any crawler, should mainly be used for local testing as crawlers should be deployed indiviually
@@ -33,3 +32,41 @@ func test_local(conn *sql.DB) {
 
 	local.RunLocalCrawler(folder,start,end,offset,stride,conn)
 }
+
+var r = InitRequestGuard()
+
+func InitRequestGuard()  chan  struct{} {
+	r := make(chan struct{},1)
+	r<- struct{}{}
+	return r
+}
+
+
+// Can channels be global variables or must they be passed as arguments to go routines??
+// func global_chan_test() {
+// 	print("start")
+// 	var counter int32 = 0
+// 	var wg sync.WaitGroup
+// 	for i := 0; i< 100;i++ {
+// 		wg.Add(1)
+// 		go func() {
+// 			defer wg.Done()
+// 			<-r
+// 			go func(counter *int32) {
+// 				// creates a new go function that lets another start after x milliseconds
+// 				go func() {
+// 					time.Sleep(10 * time.Millisecond)
+// 					r<-struct{}{}
+// 				}()
+// 				atomic.AddInt32(counter, 1)
+// 				time.Sleep(100 * time.Millisecond)
+// 				print("thread finished")
+				
+// 			}(&counter)
+// 		}()
+// 	}
+// 	wg.Wait()
+// 	print(counter)
+// }
+
+

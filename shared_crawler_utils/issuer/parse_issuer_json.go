@@ -3,7 +3,6 @@ package issuer
 import (
 	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +11,7 @@ import (
 )
 
 
-func crawlIssuerJSON(cik string) utils.Issuer {
+func parseIssuerJSON(cik string) utils.Issuer {
 	var issuer utils.Issuer
 	client := &http.Client{}
 
@@ -34,7 +33,6 @@ func crawlIssuerJSON(cik string) utils.Issuer {
 		panic(err)
 	}
 	if resp.StatusCode == 429 {
-		//sendFailureEmail("429 when getting rss!")
 		panic("429 on rss")
 	}
 	// // Parse the response body using gofeed.Parser
@@ -42,14 +40,12 @@ func crawlIssuerJSON(cik string) utils.Issuer {
 	if err != nil {
 		panic(err)
 	}
-	println(resp.Status)
 	json.Unmarshal(data,&issuer)
 	
 	issuer.Sector,issuer.Industry,err = getSectorAndIndustry(issuer.Tickers)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(issuer.Sic_description)
 	return issuer
 }
 

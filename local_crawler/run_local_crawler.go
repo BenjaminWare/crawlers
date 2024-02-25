@@ -7,6 +7,7 @@ import (
 	"time"
 
 	. "insiderviz.com/crawlers/shared_crawler_utils"
+	. "insiderviz.com/crawlers/shared_crawler_utils/issuer"
 )
 
 /*
@@ -20,7 +21,7 @@ import (
 */
 func RunLocalCrawler(submissions_folder string, start string,end string,offset int, stride int, conn *sql.DB) {
 	num_threads := 20 //Specifies how many thread we should try and use, each thread handles one form
-
+	seen_ciks := make([]string,0)
 	// Ensures only num_threads are created, by using a channel of empty structs
 	thread_guard := make(chan struct{} , num_threads)
 	var wg sync.WaitGroup
@@ -34,13 +35,17 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 	var currentFilesMutex sync.Mutex
 	start_time := time.Now().UnixMilli();
 	
-	for i :=offset; i <len(fileNames);i+=stride {
+	for i :=offset; i <200;i+=stride {
 		fileName := fileNames[i]
 		//forms has all the acc_nums and urls needed to get all the forms for a specific issuer
-		forms := getFormsFromJson(submissions_folder+"/"+fileName, start,end)
+		forms,cik := parseSubmissionsFileJSON(submissions_folder+"/"+fileName, start,end)
 
 		//This is an issuer with atleast one form
 		if len(forms) > 0 {
+			if cik != "" {
+				seen_ciks = append(seen_ciks,cik)
+			}
+
 			thread_guard <- struct{}{} // would block if guard channel is already filled
 			wg.Add(1)
 			currentFilesMutex.Lock()
@@ -76,6 +81,11 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 		}
 
 	}
-
 	wg.Wait()
+	fmt.Println("Crawling Issuers")
+	// Crawls all the seen issuers
+	CrawlIssuersByCIK(conn,seen_ciks,num_threads)
+
+
+
 }

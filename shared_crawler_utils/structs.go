@@ -5,7 +5,6 @@ import "encoding/xml"
 type RawForm4 struct {
 	XMLName                  xml.Name           `xml:"ownershipDocument" json:"-"`
 	DateAdded                string             `xml:"-" json:"DateAdded"`
-	IssuerTradingSymbol      string             `xml:"issuer.issuerTradingSymbol"`
 	SchemaVersion            string             `xml:"schemaVersion"`
 	DocumentType             string             `xml:"documentType"`
 	PeriodOfReport           string             `xml:"periodOfReport"`
@@ -35,7 +34,7 @@ type Footnote struct {
 
 type Issuer struct {
 	Cik                    string   `json:"cik"`
-	Name                   string   `json:"issuerName"`
+	Name                   string   `json:"name"`
 	Tickers                []string `json:"tickers"`
 	Exchanges              []string `json:"exchanges"`
 	Sic                    string   `json:"sic"`

@@ -56,7 +56,6 @@ CREATE TABLE reporter (
 CREATE TABLE form (
     acc_num varchar(20) primary key,
     created_at timestamp not null default current_timestamp,
-    issuer_ticker varchar(10) not null references tickers (ticker),
     period_of_report varchar(10) not null,
     rpt_is_director boolean not null,
     rpt_is_officer boolean not null,
