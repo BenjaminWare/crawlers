@@ -124,7 +124,7 @@ CREATE TABLE footnote(
 CREATE TABLE footnote_inst(
     id serial primary key,
     acc_num varchar(20) not null,
-    footnote_id bigint not null,
+    footnote_id bigint unsigned not null,
     -- Joining footnote to footnote_inst requires both acc_num and footnote_id to footnote(id)
     -- At most one of these two attributes is not null, it indicates that a footnote references a field within a certain transaction, when joining make sure to include acc_num
     dt_id bigint unsigned,
