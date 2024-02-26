@@ -286,6 +286,13 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 		if net_shares > MONEY_MAX {
 			net_shares = MONEY_MAX
 		}
+		if net_total < -1 * MONEY_MAX {
+			net_total = -1 * MONEY_MAX
+		}
+		if net_shares < -1 * MONEY_MAX {
+			net_shares = -1 * MONEY_MAX
+		}
+
 
 		transaction_codes_slice :=  (strings.Split(transaction_codes, ""))
 		sort.Strings(transaction_codes_slice)

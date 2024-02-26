@@ -32,5 +32,5 @@ func main() {
 		ciks[i] = strings.Repeat("0",10 - len(cik)) + cik
 	}
 	conn := utils.CreateMySQLConnection("root:root@tcp(127.0.0.1:3306)/insiderviz-crawler")
-	issuer_utils.CrawlIssuersByCIK(conn,ciks,10)
+	issuer_utils.CrawlIssuersByCIK(conn,ciks,20)
 }

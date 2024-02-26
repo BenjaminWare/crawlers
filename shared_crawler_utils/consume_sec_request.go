@@ -16,13 +16,14 @@ func InitRequestGuard()  chan  struct{} {
 
 */
 func ConsumeSECRequest() {
+	print(&request_guard,"\n")
 	// Waits for a request to be available
 	<-request_guard
 
 	// Makes a request available after 110 milliseconds
 	go func(request_guard chan struct{}) {
 		// Theoretically could be 100 ms, but this causes 429, too many request errors
-		time.Sleep(105 * time.Millisecond)
+		time.Sleep(110 * time.Millisecond)
 		request_guard<-struct{}{}
 	}(request_guard)
 }

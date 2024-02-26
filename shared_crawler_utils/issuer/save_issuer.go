@@ -24,7 +24,7 @@ func saveIssuer(conn *sql.DB,issuer Issuer) bool{
 	if err != nil {
 		panic(err)
 	}
-
+                
 	rows,err := result.RowsAffected()
 	if err != nil {
 		panic(err)

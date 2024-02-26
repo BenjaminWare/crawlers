@@ -33,6 +33,7 @@ func parseIssuerJSON(cik string) utils.Issuer {
 		panic(err)
 	}
 	if resp.StatusCode == 429 {
+		print(url)
 		panic("429 on rss")
 	}
 	// // Parse the response body using gofeed.Parser
