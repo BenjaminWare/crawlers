@@ -277,6 +277,7 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 		var net_shares float32 = 0.0
 		var net_total float32 = 0.0
 		transaction_codes := ""
+		// TODO process derivative transaction table???
 		for _, trans := range form.NonDerivativeTable.NonDerivativeTransactions {
 			if !strings.Contains(transaction_codes,trans.TransactionCoding.TransactionCode) {
 				transaction_codes += trans.TransactionCoding.TransactionCode
