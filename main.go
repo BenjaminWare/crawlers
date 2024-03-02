@@ -26,10 +26,10 @@ func test_live(conn *sql.DB) {
 func test_local(conn *sql.DB) {
 	folder := "./submissions/2024-01-27"
 
-	offset := 0 // start at the first company
+	offset := 4998 // start at the first company
 	stride := 1 // only go one at a time
 	start := "0001-01-01" //start 
 	end := "3000-01-01" // end, arbitrary date in future means get everything
-
-	local.RunLocalCrawler(folder,start,end,offset,stride,conn)
+	// local.RunIssuerCrawl(folder,conn)
+	local.RunFormCrawl(folder,start,end,offset,stride,conn)
 }

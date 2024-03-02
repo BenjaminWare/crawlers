@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS non_derivative_transaction;
 
 DROP TABLE IF EXISTS derivative_transaction;
 
+DROP TABLE IF EXISTS form_to_reporter;
+
 DROP TABLE IF EXISTS form;
 
 DROP TABLE IF EXISTS stock_day;
@@ -44,6 +46,7 @@ CREATE TABLE stock_day (
     ticker varchar(10) not null,
     date varchar(10) not null,
     close decimal(19,4) not null,
+    volume bigint unsigned not null,
     foreign key (ticker) references ticker(ticker),
     CONSTRAINT PK_stock_day primary key (ticker,date)
 );
@@ -52,7 +55,6 @@ CREATE TABLE reporter (
     cik varchar(10) primary key,
     name varchar(200) not null
 );
-
 CREATE TABLE form (
     acc_num varchar(20) primary key,
     created_at timestamp not null default current_timestamp,
@@ -64,7 +66,7 @@ CREATE TABLE form (
     rpt_officer_title varchar(100),
     rpt_other_text varchar(100),
     issuer_cik varchar(10) not null,
-    reporter_cik varchar(10) not null,
+    reporter_cik varchar(10) not null, 
     xml_url varchar(300) not null,
     pdf_url varchar(300) not null,
     net_shares decimal(19,4) not null,
@@ -72,6 +74,14 @@ CREATE TABLE form (
     transaction_codes varchar(20) not null,
     foreign key (issuer_cik) references issuer (cik),
     foreign key (reporter_cik) references reporter (cik)
+);
+-- Form and reporter are many to many as each form can have multiple reporters
+CREATE TABLE form_to_reporter (
+    acc_num varchar(20) not null,
+    reporter_cik varchar(10) not null,
+    constraint pk_form_to_reporter primary key (acc_num,reporter_cik),
+    foreign key (acc_num) references form(acc_num),
+    foreign key (reporter_cik) references reporter(cik)
 );
 
 CREATE TABLE derivative_transaction (

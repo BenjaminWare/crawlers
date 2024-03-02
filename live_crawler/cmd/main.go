@@ -20,7 +20,7 @@ func main() {
 }
 
 func handler(event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,error) {
-	conn = CreateMySQLConnection(os.Getenv("connection_string"))
+	conn = CreateMySQLConnection(os.Getenv("CONNECTION_STRING"))
 	success := LiveCrawl(conn)
 
 	message := "SUCCESS: Live Crawler got all forms"

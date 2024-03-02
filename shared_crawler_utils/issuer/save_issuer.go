@@ -16,8 +16,9 @@ func saveIssuer(conn *sql.DB,issuer Issuer) bool{
 	}
 
 	issuerSql := `
-	replace into issuer (cik, name, sic, sic_description, ein, state_of_incorporation,fiscal_year_end, phone, sector, industry)
+	insert into issuer (cik, name, sic, sic_description, ein, state_of_incorporation,fiscal_year_end, phone, sector, industry)
 	values (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+	ON DUPLICATE KEY UPDATE cik=cik
 	`
 
 	result, err := tx.Exec(issuerSql,issuer.Cik,issuer.Name,issuer.Sic,issuer.Sic_description,issuer.Ein,issuer.State_of_incorporation,issuer.Fiscal_year_end,issuer.Phone,issuer.Sector,issuer.Industry)
@@ -45,8 +46,9 @@ func saveTickers(conn *sql.DB,issuer Issuer) {
 	}
 	
 	tickersSql := `
-	replace into ticker (cik,ticker)
+	insert into ticker (cik,ticker)
 	values (?,?)
+	ON DUPLICATE KEY UPDATE ticker=ticker
 	`
 	for _,ticker := range issuer.Tickers {
 		_, err = tx.Exec(tickersSql,issuer.Cik,ticker)

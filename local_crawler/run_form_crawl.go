@@ -7,7 +7,6 @@ import (
 	"time"
 
 	. "insiderviz.com/crawlers/shared_crawler_utils"
-	. "insiderviz.com/crawlers/shared_crawler_utils/issuer"
 )
 
 /*
@@ -19,14 +18,12 @@ import (
 	@conn - mySQL database pointer to put forms into
 
 */
-func RunLocalCrawler(submissions_folder string, start string,end string,offset int, stride int, conn *sql.DB) {
+func RunFormCrawl(submissions_folder string, start string,end string,offset int, stride int, conn *sql.DB) {
 	num_threads := 20 //Specifies how many thread we should try and use, each thread handles one form
 	// Ensures only num_threads are created, by using a channel of empty structs
 	thread_guard := make(chan struct{} , num_threads)
 	var wg sync.WaitGroup
 	fileNames := GetFilenamesInDirectory(submissions_folder)
-	
-
 
 	//Loop through all the files, which are all the forms filed for companies and insiders, we only care about companies
 	var formsCompleted int32 = 0
@@ -37,15 +34,10 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 	for i :=offset; i <len(fileNames);i+=stride {
 		fileName := fileNames[i]
 		//forms has all the acc_nums and urls needed to get all the forms for a specific issuer
-		forms,cik := parseSubmissionsFileJSON(submissions_folder+"/"+fileName, start,end)
+		forms,_ := parseSubmissionsFileJSON(submissions_folder+"/"+fileName, start,end)
 
 		//This is an issuer with atleast one form
 		if len(forms) > 0 {
-			// Crawls the issuer data sequentially so that if the program crashes all issuers will still be present
-			if cik != "" {
-				 CrawlIssuersByCIK(conn,[]string{cik},1)
-			}
-
 			thread_guard <- struct{}{} // would block if guard channel is already filled
 			wg.Add(1)
 			currentFilesMutex.Lock()
@@ -82,7 +74,6 @@ func RunLocalCrawler(submissions_folder string, start string,end string,offset i
 
 	}
 	wg.Wait()
-
 
 
 }

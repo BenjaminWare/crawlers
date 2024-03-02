@@ -32,7 +32,7 @@ func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 
 	//Attempt the request 10 times on account of random 503s and connected parties not responding in time
 	requestSuccess := false
-	for i := 0; i < 3 && !requestSuccess; i++ { 
+	for i := 0; i < 10 && !requestSuccess; i++ { 
 		//Only make request to SEC if one is available obeying 10/sec rule
 		ConsumeSECRequest()
 		resp, err = client.Do(req)
@@ -41,6 +41,7 @@ func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 			requestSuccess = true
 		}
 	}
+	
 	
 	if requestSuccess {
 		// get data from res body
@@ -51,6 +52,10 @@ func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 
 		// parse the xml
 		xml.Unmarshal(data, &form4)	
+		// the form doesn't a ctually exist
+		if form4.PeriodOfReport == "" {
+			return form4, errors.New("Form not found at given url: " + url)
+		}
 		if(len(form4.Footnotes.Footnote) > 0) {
 			//Trims whitespace around Footnote ids " F2 " -> "F2"
 			FootnotesWhitespaceless := make([]Footnote,len(form4.Footnotes.Footnote))
@@ -67,13 +72,19 @@ func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 		}
 		today := time.Now()
 		form4.AccessionNumber = accNum
+		form4.IssuerCIK = strings.Repeat("0",10 - len(form4.IssuerCIK)) + form4.IssuerCIK
+		for i := range form4.ReportingOwners {
+			form4.ReportingOwners[i].ReportingOwnerId.RptOwnerCik =  strings.Repeat("0",10 - len(form4.ReportingOwners[i].ReportingOwnerId.RptOwnerCik)) +  form4.ReportingOwners[i].ReportingOwnerId.RptOwnerCik
+		}
 		form4.Url = url
 		form4.DateAdded = today.Format("2006-01-02")    
 
 		return form4,nil
 	} else {
+		print(url)
+		panic("Status Code: " + resp.Status + " Form: " + url)
 		// Form couldn't be parsed
-		return form4, errors.New("Status Code: " + resp.Status + "Form: " + url)
+		// return form4, errors.New("Status Code: " + resp.Status + " Form: " + url)
 	}
 }
 

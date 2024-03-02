@@ -209,6 +209,18 @@ func saveDerivHolding(tx *sql.Tx, acc_num string, data DerivativeHolding) int {
 	return int(id)
 
 }
+func saveFormToReporter(tx *sql.Tx, acc_num string,reporter_cik string) {
+	formToReporterSql := `
+	insert into form_to_reporter (acc_num,reporter_cik)
+	values (?, ?)	
+	`
+	_, err := tx.Exec(formToReporterSql, acc_num,reporter_cik)
+	if err != nil {
+		fmt.Println("Error saving form_to_reporter:", err)
+	}
+
+}
+
 func saveFootnote(tx *sql.Tx, acc_num string, text string) int {
 	footnoteSql := `
 	insert into footnote (acc_num,text)
@@ -292,8 +304,16 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 		if net_shares < -1 * MONEY_MAX {
 			net_shares = -1 * MONEY_MAX
 		}
-
-
+		// Inserts reporters whenever they are found in a form, consider memoizing this so not every reporter needs a write, ie save the most recent 1000 reporter ciks
+		for _,reporter := range form.ReportingOwners {
+			err = setReporter(tx, reporter.ReportingOwnerId.RptOwnerCik, reporter.ReportingOwnerId.RptOwnerName)
+			if err != nil {
+				fmt.Println("Error saving reporter:", err)
+				panic(err)
+			}
+		}
+		
+	
 		transaction_codes_slice :=  (strings.Split(transaction_codes, ""))
 		sort.Strings(transaction_codes_slice)
 		transaction_codes = strings.Join(transaction_codes_slice,"")
@@ -311,7 +331,7 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 			form.ReportingOwners[0].ReportingOwnerRelationship.OtherText, form.IssuerCIK, form.ReportingOwners[0].ReportingOwnerId.RptOwnerCik, form.Url, "",net_shares,net_total,transaction_codes)
 			
 		if err != nil {
-			fmt.Println(net_total)
+			fmt.Println(form.Url,"CIK",form.IssuerCIK,"CIK")
 			fmt.Println("Error saving form:", err)
 		}
 		rowsAffected,rowsAffectedErr := formResponse.RowsAffected()
@@ -319,15 +339,9 @@ func SaveForm(Conn *sql.DB,form RawForm4) bool{
 		// Only input all the other tables if the form was successfuly inserted
 		if rowsAffectedErr == nil && rowsAffected == 1{
 			
-			err = setReporter(tx, form.ReportingOwners[0].ReportingOwnerId.RptOwnerCik, form.ReportingOwners[0].ReportingOwnerId.RptOwnerName)
-			if err != nil {
-				fmt.Println("Error saving reporter:", err)
-				panic(err)
-			}
-		
-
-				
-
+		for _,reporter := range form.ReportingOwners {
+			saveFormToReporter(tx,form.AccessionNumber,reporter.ReportingOwnerId.RptOwnerCik)
+		}
 		//save footnotes
 		//Hold onto the id of footnotes inserted, in case they are in a transaction, so we can put the id in the join table
 		footnoteSQLIds := map[string]int{} // F# to SQLId

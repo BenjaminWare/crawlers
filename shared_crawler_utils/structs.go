@@ -12,7 +12,7 @@ type RawForm4 struct {
 	NoSecuritiesOwned        bool               `xml:"noSecuritiesOwned"`
 	AccessionNumber          string             `xml:"accessionNumber"`
 	Url                      string             `xml:"url"`
-	IssuerCIK                string             `xml:"issuer.issuerCik"`
+	IssuerCIK                string             `xml:"issuer>issuerCik"`
 	ReportingOwners          []ReportingOwner   `xml:"reportingOwner" json:"ReportingOwners"`
 	NonDerivativeTable       NonDerivativeTable `xml:"nonDerivativeTable"`
 	DerivativeTable          DerivativeTable    `xml:"derivativeTable"`

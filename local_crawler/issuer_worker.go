@@ -21,7 +21,7 @@ func issuerWorker(forms []FormJsonEntry, conn *sql.DB, counter *int32, start_tim
 
 		//Uses rawForm4 struct to populate database
 		if err != nil {
-			panic(err)
+			fmt.Println(err.Error())
 		} else {
 			SaveForm(conn, xml)
 			atomic.AddInt32(counter, 1)

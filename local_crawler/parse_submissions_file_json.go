@@ -32,7 +32,7 @@ func parseSubmissionsFileJSON(fileName, startDate string,endDate string) ([]Form
 	decoder := json.NewDecoder(jsonFile)
 	err = decoder.Decode(&apiResponse)
 	if err != nil {
-		panic(err)
+		return entries, ""
 	}
 
 	// setup the cik
