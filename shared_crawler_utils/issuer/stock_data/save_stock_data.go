@@ -12,7 +12,6 @@ func saveStockData(conn *sql.DB,stockDays []stockDay){
 	if err != nil {
 		panic(err)
 	}
-
 	stockDaySql := `
 	insert into stock_day (ticker,date,close,volume)
 	values (?, ?, ?, ?)

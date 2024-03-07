@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-co-op/gocron"
 	. "insiderviz.com/crawlers/shared_crawler_utils"
+	issuer_utils "insiderviz.com/crawlers/shared_crawler_utils/issuer"
 )
 
 /*
@@ -20,7 +21,21 @@ func LiveCrawl(conn *sql.DB) bool{
 	ctx, cancel := context.WithCancel(context.Background())
 	// create the channel to pass through data
 	data := make(chan RawForm4)
-	issuer_data := make(chan string)
+
+
+	// Reads issuer_ciks currently in db and stores them in @seen_ciks map
+	seen_ciks := make(map[string]struct{},0)
+	issuer_sql := `select cik from issuer`
+	result, err := conn.Query(issuer_sql)
+	if err != nil {
+		panic(err)
+	}
+	for result.Next() {
+		var cik string
+		result.Scan(&cik)
+		seen_ciks[cik] = struct{}{}
+	}
+
 	// Creates second thread for getForm4RSS
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -32,9 +47,15 @@ func LiveCrawl(conn *sql.DB) bool{
 
 	// When SaveForm finds a duplicate getForm4RSS is stopped by cancel()
 	duplicate := false
-	seen_ciks := make(map[string]struct{},0)
 	for form := range data {
-		// Must attempt to crawl issuer first in case it is new or updated
+		// Must crawl issuer first if it is new, this should be very rare
+		_, cik_already_saved := seen_ciks[form.IssuerCIK]
+		if !cik_already_saved {
+			fmt.Println("NEW CIK FOUND SAVING ",form.IssuerCIK)
+			// Crawls the issuer that isn't in the db including all of its stock data
+			issuer_utils.CrawlIssuersByCIK(conn,[]string{form.IssuerCIK},true,"0001-01-01",1)
+		}
+		//Saves form to db terminating when the form is a duplicate
 		if SaveForm(conn, form) {
 			fmt.Println("Duplicate found breaking")
 			duplicate = true
