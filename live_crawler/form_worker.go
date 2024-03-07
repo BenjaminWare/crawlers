@@ -1,7 +1,7 @@
 package live_crawler
 
 import (
-	. "insiderviz.com/crawlers/shared_crawler_utils"
+	. "insiderviz.com/crawlers/utils"
 )
 
 /*

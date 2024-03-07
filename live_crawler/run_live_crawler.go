@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	. "insiderviz.com/crawlers/shared_crawler_utils"
-	issuer_utils "insiderviz.com/crawlers/shared_crawler_utils/issuer"
+	. "insiderviz.com/crawlers/utils"
+	issuer_utils "insiderviz.com/crawlers/utils/issuer"
 )
 
 /*

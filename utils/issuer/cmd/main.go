@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	utils "insiderviz.com/crawlers/shared_crawler_utils"
-	issuer_utils "insiderviz.com/crawlers/shared_crawler_utils/issuer"
+	utils "insiderviz.com/crawlers/utils"
+	issuer_utils "insiderviz.com/crawlers/utils/issuer"
 )
 
 // Entry point to test functionality in the issuer package

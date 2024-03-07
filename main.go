@@ -7,8 +7,8 @@ import (
 	"github.com/joho/godotenv"
 	live "insiderviz.com/crawlers/live_crawler"
 	local "insiderviz.com/crawlers/local_crawler"
-	utils "insiderviz.com/crawlers/shared_crawler_utils"
-	stock_data_utils "insiderviz.com/crawlers/shared_crawler_utils/issuer/stock_data"
+	utils "insiderviz.com/crawlers/utils"
+	stock_data_utils "insiderviz.com/crawlers/utils/issuer/stock_data"
 )
 
 // This file can run any crawler, should mainly be used for local testing as crawlers should be deployed indiviually

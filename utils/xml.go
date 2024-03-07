@@ -1,4 +1,4 @@
-package shared_crawler_utils
+package utils
 
 import (
 	"bytes"

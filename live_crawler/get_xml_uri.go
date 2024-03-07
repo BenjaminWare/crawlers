@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	crawler_utils "insiderviz.com/crawlers/shared_crawler_utils"
+	crawler_utils "insiderviz.com/crawlers/utils"
 )
 
 

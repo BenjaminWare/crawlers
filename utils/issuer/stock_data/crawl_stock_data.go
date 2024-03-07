@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	utils "insiderviz.com/crawlers/shared_crawler_utils"
+	utils "insiderviz.com/crawlers/utils"
 )
 func CrawlStockData(conn *sql.DB,tickers []string, startDate string, num_threads int) {
 

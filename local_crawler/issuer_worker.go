@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	. "insiderviz.com/crawlers/shared_crawler_utils"
+	. "insiderviz.com/crawlers/utils"
 )
 
 /*

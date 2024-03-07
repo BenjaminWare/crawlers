@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	stock_data_utils "insiderviz.com/crawlers/shared_crawler_utils/issuer/stock_data"
+	stock_data_utils "insiderviz.com/crawlers/utils/issuer/stock_data"
 )
 
 /*

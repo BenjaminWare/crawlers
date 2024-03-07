@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	. "insiderviz.com/crawlers/shared_crawler_utils"
+	. "insiderviz.com/crawlers/utils"
 )
 
 // Saves issuer to given db returns true if the issuer was already present

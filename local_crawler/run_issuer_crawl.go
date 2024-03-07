@@ -3,8 +3,8 @@ package local_crawler
 import (
 	"database/sql"
 
-	. "insiderviz.com/crawlers/shared_crawler_utils"
-	. "insiderviz.com/crawlers/shared_crawler_utils/issuer"
+	. "insiderviz.com/crawlers/utils"
+	. "insiderviz.com/crawlers/utils/issuer"
 )
 
 /*

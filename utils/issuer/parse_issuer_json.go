@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	utils "insiderviz.com/crawlers/shared_crawler_utils"
+	utils "insiderviz.com/crawlers/utils"
 )
 
 
