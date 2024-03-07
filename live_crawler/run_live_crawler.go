@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-
 	. "insiderviz.com/crawlers/shared_crawler_utils"
 )
 
@@ -21,17 +20,21 @@ func LiveCrawl(conn *sql.DB) bool{
 	ctx, cancel := context.WithCancel(context.Background())
 	// create the channel to pass through data
 	data := make(chan RawForm4)
+	issuer_data := make(chan string)
 	// Creates second thread for getForm4RSS
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		getForm4RSS(data, ctx)
+		getForm4RSS(data,ctx)
 
 	}()
+
 	// When SaveForm finds a duplicate getForm4RSS is stopped by cancel()
 	duplicate := false
+	seen_ciks := make(map[string]struct{},0)
 	for form := range data {
+		// Must attempt to crawl issuer first in case it is new or updated
 		if SaveForm(conn, form) {
 			fmt.Println("Duplicate found breaking")
 			duplicate = true
@@ -42,6 +45,9 @@ func LiveCrawl(conn *sql.DB) bool{
 
 	// Both Loading and Saving are finished
 	wg.Wait()
+	fmt.Println("Saving Issuers")
+	
+
 
 	// A duplicate being found indicates success as there is an overlap between forms in the feed and the DB
 	if !duplicate {
@@ -56,7 +62,7 @@ func LiveCrawl(conn *sql.DB) bool{
 
 /*
 	Runs the live crawler against the https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=4&company=&dateb=&owner=only&start=0&count=100&output=atom rss feed
-	Every 5 minutes from 12am-6pm monday through friday
+	Every 5 minutes from 6am-10pm monday through friday
 
 	The live crawler finds, parses and stores all the new forms into the given sql db at @conn
 	When a form is detected as already being in the db the crawling stops 
@@ -69,7 +75,7 @@ func RunLiveCrawler(conn *sql.DB) {
 
 	s := gocron.NewScheduler(timezone)
 	// Schedule the job to run every 5 minutes
-	s.Cron("*/5 0-18 * * 1-5").Do(func() {
+	s.Cron("*/5 6-23 * * 1-5").Do(func() {
 		LiveCrawl(conn)
 	})
 	s.StartBlocking()

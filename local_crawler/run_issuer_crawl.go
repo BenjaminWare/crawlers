@@ -24,7 +24,7 @@ func RunIssuerCrawl(submissions_folder string, conn *sql.DB) {
 	// Crawls Issuers, this is done before any of the forms to respect foreign keys and because the SEC 10 req/sec seems to trigger at less than 10 req/sec when using more than one endpoint
 	////////////////////////////////
 	ciks :=parseSubmissionsFolderToIssuerCiks(submissions_folder,fileNames)
-	CrawlIssuersByCIK(conn,ciks,num_threads)
+	CrawlIssuersByCIK(conn,ciks,false, "", num_threads)
 	/////////////////////////////////
 
 

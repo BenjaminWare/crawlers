@@ -81,7 +81,7 @@ func FromURLLoadForm4XML(url, accNum, userAgent string) (RawForm4,error) {
 
 		return form4,nil
 	} else {
-		print(url)
+		print(url,resp.Status)
 		panic("Status Code: " + resp.Status + " Form: " + url)
 		// Form couldn't be parsed
 		// return form4, errors.New("Status Code: " + resp.Status + " Form: " + url)

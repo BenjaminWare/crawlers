@@ -16,7 +16,7 @@ func saveStockData(conn *sql.DB,stockDays []stockDay){
 	stockDaySql := `
 	insert into stock_day (ticker,date,close,volume)
 	values (?, ?, ?, ?)
-	ON DUPLICATE KEY UPDATE
+	ON DUPLICATE KEY UPDATE ticker=ticker
 	`
 	for _,stockDay := range stockDays {
 		_, err := tx.Exec(stockDaySql,stockDay.Ticker,stockDay.Date,stockDay.Close,stockDay.Volume)

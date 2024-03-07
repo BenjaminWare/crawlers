@@ -10,14 +10,12 @@ import (
 
 func parseStockData(client *http.Client,ticker string,startDate string) ([]stockDay,error){
 	uri := fmt.Sprintf("https://eodhistoricaldata.com/api/eod/%s?fmt=json&from=%s&api_token=%s", ticker, startDate, os.Getenv("EOD_TOKEN"))
-
 	stockData := make([]stockDay,0)
 	// create the http request
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
 		return stockData, err
 	}
-
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		return stockData, err
@@ -28,7 +26,6 @@ func parseStockData(client *http.Client,ticker string,startDate string) ([]stock
 	if err != nil {
 		return stockData, err
 	}
-
 	// parse the response
 	var apiRes []eodDayEntry
 	err = json.Unmarshal(bodyBytes, &apiRes)
@@ -36,7 +33,6 @@ func parseStockData(client *http.Client,ticker string,startDate string) ([]stock
 		return stockData, err
 	}
 
-	
 	// convert the response to the correct format
 	for _, entry := range apiRes {
 		stockData = append(stockData, stockDay{
@@ -46,6 +42,8 @@ func parseStockData(client *http.Client,ticker string,startDate string) ([]stock
 			Volume: entry.Volume,
 		})
 	}
+
+
 	return stockData,nil
 }
 
