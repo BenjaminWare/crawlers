@@ -96,7 +96,7 @@ func RunLiveCrawler(conn *sql.DB) {
 
 	s := gocron.NewScheduler(timezone)
 	// Schedule the job to run every 5 minutes
-	s.Cron("*/5 6-23 * * 1-5").Do(func() {
+	s.Cron("*/5 6-22 * * 1-5").Do(func() {
 		LiveCrawl(conn)
 	})
 	s.StartBlocking()

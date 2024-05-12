@@ -10,12 +10,11 @@ import (
 	utils "insiderviz.com/crawlers/utils"
 )
 
-
 func parseIssuerJSON(cik string) utils.Issuer {
 	var issuer utils.Issuer
 	client := &http.Client{}
 
-	url := "https://data.sec.gov/submissions/CIK"+cik+".json"
+	url := "https://data.sec.gov/submissions/CIK" + cik + ".json"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
@@ -37,13 +36,13 @@ func parseIssuerJSON(cik string) utils.Issuer {
 		panic("429 on rss")
 	}
 	// // Parse the response body using gofeed.Parser
-	data,err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
-	json.Unmarshal(data,&issuer)
-	
-	issuer.Sector,issuer.Industry,err = getSectorAndIndustry(issuer.Tickers)
+	json.Unmarshal(data, &issuer)
+
+	issuer.Sector, issuer.Industry, err = getSectorAndIndustry(issuer.Tickers)
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +55,8 @@ func getSectorAndIndustry(tickers []string) (string, string, error) {
 	// load the csv file
 	file, err := os.Open("data/Sectors.csv")
 	if err != nil {
-		return "", "", err
+		// Just retun empty strings if the file can't be found for example if in the live_crawler
+		return "", "", nil
 	}
 	defer file.Close()
 

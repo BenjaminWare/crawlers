@@ -9,12 +9,25 @@ A collection of crawlers used to crawl SEC data into SQL databases expects a .en
 3. stock_day_crawler - Gets todays stock data information for all companies, should run daily. Uses the EOD historical data endpoint.
 4. issuer_update_crawler - Updates issuer and ticker tables as information about issuers changes. Doesn't need to run to often as changes to companies are more rare (once a week should work).
 5. shared_crawler_utils - Has helper function used across multiple crawlers also includes sub packages for issuer and stock_day crawling specifically. (the stock_day_crawler is only responsible for todays stock_data the other crawlers get historical stock_data)
-   Setting up Live-Crawler:
-   To build the live crawler docker image from the root directory (The file is named Dockerfile.live_crawler anticipating the creation of other dockerfiles):
-   docker build -f Dockerfile.live_crawler --platform linux/amd64 -t docker-image:test .
+
+
+
+## Creating lambda functions from golang packages
+Docker and the aws cli must be installed and you must have access to an aws account.
+
+Using the live_crawler as an example:
+To build the live crawler docker image from the root directory (The file is named Dockerfile.live_crawler anticipating the creation of other dockerfiles):
+"""
+   docker build -f Dockerfile.live_crawler --platform linux/amd64 -t docker-image:<NAME_OF_DOCKER_IMAGE> .
+"""
+
+In this case it make sense for <NAME_OF_DOCKER_IMAGE> to be live_crawler
 
 Create an ECR_REPO in AWS then run these docker commands to populate it:
-docker tag docker-image:test <ECR_REPO_URI>:latest
+docker tag docker-image:<NAME_OF_DOCKER_IMAGE> <ECR_REPO_URI>:latest
+
+(This will require your console to be logged in, meaning you need the aws cli and you must have run "aws configure" this will require an access key you can create in AWS IAM)
+(This command worked for me though it is marked deprecated "docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) <ECR_REPO_URI>")
 docker push <ECR_REPO_URI>:latest
 
 Create a lambda function from the container image you created in ECR
@@ -30,3 +43,4 @@ When populating an aurora db from a sqldump:
 ### Helpful Notes
 
 1. EOD API doesn't accept 0000-00-00 as a date use 0001-01-01 to get first day
+2. EOD API is inclusive on start_date so giving it todays date will get just todays stock data (if today is already ready, 15 minutes after market close)
